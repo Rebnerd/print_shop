@@ -2,7 +2,7 @@
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb my-2">
       <li class="breadcrumb-item active"><a href="/">确认打印机情况</a></li>
-      <li class="breadcrumb-item active"><a>创建打印任务</a></li>
+      <li class="breadcrumb-item"><a>创建打印任务</a></li>
       <li class="breadcrumb-item"><a>付款</a></li>
       <li class="breadcrumb-item"><a>上传打印文件</a></li>
     </ol>
@@ -21,9 +21,9 @@ export default {
 
   watch: {
     at(newAt) {
-      console.log(newAt)
+      // console.log(newAt)
       let index = this.order.indexOf(newAt)+1
-      console.log(index)
+      // console.log(index)
       for(let i =1;i<=index;i++){
         let el = document.querySelector(`li:nth-child(${i})`)
         el.classList.add('active')
@@ -52,6 +52,8 @@ nav .breadcrumb {
   color: #999 !important;
   z-index: 1;
   text-decoration: none;
+  box-sizing: border-box;
+  margin: 2px;
 }
 
 .breadcrumb .breadcrumb-item {

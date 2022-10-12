@@ -1,10 +1,8 @@
 <template>
 <!--  pass the current location to breadscrum-->
-  <div>13-412自助打印店</div>
   <bread-scrum class="bread" :at="getPath"/>
-  <div class="view">
+  <div class="view container-md d-flex">
   <router-view/>
-    <router-link :to="getNextLoc()"><button type="button" class="btn btn-primary link">下一步</button></router-link>
   </div>
 </template>
 
@@ -18,6 +16,7 @@ export default {
     }
   },
   methods:{
+    // this is deprecated !! no use
     getNextLoc(){
       return this.order[this.order.indexOf(this.getPath)+1]
     }
@@ -38,19 +37,20 @@ export default {
   color: #2c3e50;
 }
 .bread{
-  position: absolute;
+  position:absolute;
   left: 50%;
   transform: translateX(-50%);
-  top:40px;
+  z-index:100;
+  min-width:500px;
 }
 .view{
   position: absolute;
-  top:50%;
+  top:60%;
   left: 50%;
   font-size: x-large;
   transform: translate(-50%,-50%);
+  justify-content: center;
 }
-.link{
-  margin-top: 50px;
-}
+
+
 </style>

@@ -11,15 +11,15 @@ export default {
   data() {
     return {}
   },
-  props: ['progress','jobId'],
-  watch:{
-    jobId(newId,oldId){
-      if (newId!==oldId){
-        console.log(this.jobId)
-        this.reDraw()
-      }
-    }
-  },
+  props: ['progress'],
+  // watch:{
+  //   jobId(newId,oldId){
+  //     if (newId!==oldId){
+  //       console.log(this.jobId)
+  //       this.reDraw()
+  //     }
+  //   }
+  // },
   mounted() {
     // here we have no data control yet!!
     this.reDraw()
@@ -89,10 +89,10 @@ span#procent::after {
   content: '%';
 }
 
-.canvas-wrap {
-  position: absolute;
-  top:-100%;
-  left:50%;
-}
+/*.canvas-wrap {*/
+/*  position: absolute;*/
+/*  top:%;*/
+/*  left:10%;*/
+/*}*/
 
 </style>

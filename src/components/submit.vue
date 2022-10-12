@@ -3,7 +3,7 @@
     <form @submit.prevent="submit" class="row g-3 needs-validation" novalidate>
       <div class="col-md-4">
         <label for="page-number" class="form-label">所需打印页数</label>
-        <input  v-model="form.pageNumber" type="text" class="form-control" id="page-number"  required>
+        <input  v-model="form.number" type="text" class="form-control" id="page-number"  required>
         <div class="valid-feedback">
           Looks good!
         </div>
@@ -15,13 +15,6 @@
           Looks good!
         </div>
       </div>
-<!--      <div class="col-md-3">-->
-<!--        <label for="page-range" class="form-label">页数范围(选填)</label>-->
-<!--        <input v-model="form.pageRange" type="text" class="form-control" id="page-range" placeholder="eg:0-5" required>-->
-<!--        <div class="valid-feedback">-->
-<!--          Looks good!-->
-<!--        </div>-->
-<!--      </div>-->
       <div class="col-md-4">
         <label for="dorm" class="form-label">你所在宿舍号</label>
         <div class="input-group has-validation">
@@ -33,43 +26,19 @@
           </div>
         </div>
       </div>
-<!--      <div class="col-md-6">-->
-<!--        <label for="validationCustom03" class="form-label">City</label>-->
-<!--        <input type="text" class="form-control" id="validationCustom03" required>-->
-<!--        <div class="invalid-feedback">-->
-<!--          Please provide a valid city.-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="col-md-3">-->
-<!--        <label for="validationCustom04" class="form-label">State</label>-->
-<!--        <select class="form-select" id="validationCustom04" required>-->
-<!--          <option selected disabled value="">Choose...</option>-->
-<!--          <option>...</option>-->
-<!--        </select>-->
-<!--        <div class="invalid-feedback">-->
-<!--          Please select a valid state.-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="col-md-3">-->
-<!--        <label for="validationCustom05" class="form-label">Zip</label>-->
-<!--        <input type="text" class="form-control" id="validationCustom05" required>-->
-<!--        <div class="invalid-feedback">-->
-<!--          Please provide a valid zip.-->
-<!--        </div>-->
-<!--      </div>-->
       <div class="col-12">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+          <input class="form-check-input" type="checkbox" value='box' id="invalidCheck" required>
           <label class="form-check-label" for="invalidCheck">
-            Agree to terms and conditions
+            comfirm the info above
           </label>
           <div class="invalid-feedback">
-            You must agree before submitting.
+            You must comfirm before submitting.
           </div>
         </div>
       </div>
       <div class="col-12">
-        <button class="btn btn-primary" type="submit">Submit form</button>
+        <button class="btn btn-primary" type="submit">提交表单</button>
       </div>
     </form>
   </div>
@@ -83,18 +52,26 @@ export default {
     (function () {
 
       // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      var forms = document.querySelectorAll('.needs-validation')
-
+      var inputs = document.querySelectorAll('form input')
+      //we need a monkey-patch here
+      HTMLInputElement.prototype.checkValidity=function(){
+        const regex = new RegExp('^\\+?([1-9]\\d*)$')
+        // console.log(this.nodeValue)
+        return regex.test(this.value) || this.type==='checkbox' &&this.checked === true
+      }
       // Loop over them and prevent submission
-      Array.prototype.slice.call(forms)
-          .forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-              if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
-              }
 
-              form.classList.add('was-validated')
+      Array.prototype.slice.call(inputs)
+          .forEach(function (input) {
+            input.addEventListener('focusout', function () {
+              if (!input.checkValidity()) {
+                // form.classList.remove('was-validated')
+                // input.classList.remove('is-valid')
+                input.classList.add('is-invalid')
+              }else{
+                input.classList.remove('is-invalid')
+                input.classList.add('is-valid')
+              }
             }, false)
           })
     })()
@@ -102,33 +79,49 @@ export default {
   data(){
     return {
       form:{
-        pageNumber:'',
+        number:'',
         copies:'',
         dorm:'',
       },
-      jobId:''
+    }
+  },
+  watch:{
+    form:{
+      handler(newVal){
+      console.log(newVal)
+      },
+      deep:true
     }
   },
   methods:{
     submit(){
-      console.log(this.form)
-      axios.post('http://192.168.31.58:4500/create-job',this.form)
+      // console.log(this.form)
+      var inputs = document.querySelectorAll('form input')
+      for(let i =0;i<inputs.length;i++){
+        if(inputs[i].classList.contains('is-invalid') || inputs[i].type==='checkbox' && inputs[i].checked === false){
+          return
+        }
+      }
+      // check if is null
+      for (const attr in this.form) {
+        if(this.form[attr]==='') return
+      }
+      axios.post(this.$store.state.printer+'/create-job',this.form)
       .then((res)=>{
-        console.log(res)
-        this.jobId=res.data['job-id']
+        this.$store.commit('setJobId',res.data['job-id'])
+        this.$store.commit('setMoney',this.form.number*this.form.copies*0.4)
+        // console.log(this.$store.state.money)
+        this.$router.push('/pay')
       })
-    }
+    },
   },
-  // store the jobId in localstorage
-  watch:{
-    jobId(newJodId){
-      localStorage.jobId=newJodId
-    }
-  }
 }
 
 </script>
 
 <style scoped>
+  button{
+    margin: 20px;
+  }
 
 </style>
